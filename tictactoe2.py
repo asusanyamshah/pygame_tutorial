@@ -13,11 +13,20 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # Changing the title of the game window
 pygame.display.set_caption("Tic-Tac-Toe")
 
+font = pygame.font.SysFont(None, 80)
+
 clicked = False
 
 run = True
 
 white = (255, 255, 255)
+
+green = (50, 255, 50)
+
+player = 1
+
+winner = 0
+game_over = False
 
 # Storing the data of the board in a variable named board
 # The board is basically a list 
@@ -27,23 +36,22 @@ board = [
     [0, 0, 0]
 ]
 
-winner = 0
-game_over = False
+def draw_winning_text(winner):
 
-pos = []
+    win_text = f"Player {winner} WON!"
+    winner_image = font.render(win_text, True, (0, 0, 255))
+    screen.blit(winner_image, (140, 270))
 
-player = 1
-
-def draw_marker():
+def draw_markers():
     x_pos = 0
-    for x in board:
+    for list in board:
         y_pos = 0
-        for y in x:
-            if y == 1:
+        for element in list:
+            if element == 1:
                 pygame.draw.line(screen, (50, 255, 50), (x_pos * 200 + 30, y_pos * 200 + 30), (x_pos * 200 + 170, y_pos*200 + 170), 3)
                 pygame.draw.line(screen, (50, 255, 50), (x_pos * 200 + 30, y_pos * 200 + 170), (x_pos * 200 + 170, y_pos*200 + 30), 3)
-
-            if y == -1:
+            
+            if element == -1:
                 pygame.draw.circle(screen, (50, 255, 50), (x_pos * 200 + 100, y_pos * 200 + 100), 72, 3)
 
             y_pos += 1
@@ -51,20 +59,22 @@ def draw_marker():
 
 
 def check_winner():
+
     global winner
     global game_over
 
     y_pos = 0
-    for x in board:
-        # Check for columns
-        if sum(x) == 3:
+    for list in board:
+
+        # Checking for each row
+        if sum(list) == 3:
             winner = 1
             game_over = True
-        if sum(x) == -1:
+        if sum(list) == -3:
             winner = 2
             game_over = True
 
-        # Check rows
+        # Checking for each column
 
         if board[0][y_pos] + board[1][y_pos] + board[2][y_pos] == 3:
             winner = 1
@@ -74,12 +84,12 @@ def check_winner():
             game_over = True
         y_pos += 1
     
-    # Check cross
-    if board[0][0] + board[1][1] + board[2][2] == 3 or board[2][0] + board[1][1] + board[0][2] == 3:
+    # Checking the diagonal 
+    if board[0][0] + board[1][1] + board[2][2] == 3 or board[0][2] + board[1][1] + board[2][0] == 3:
         winner = 1
         game_over = True
     
-    if board[0][0] + board[1][1] + board[2][2] == -3 or board[2][0] + board[1][1] + board[0][2] == -3:
+    if board[0][0] + board[1][1] + board[2][2] == -3 or board[0][2] + board[1][1] + board[2][0] == -3:
         winner = 2
         game_over = True
 
@@ -100,29 +110,36 @@ while run:
     pygame.draw.line(screen, (0, 0, 0), (0, 200), (600, 200), 5)
     pygame.draw.line(screen, (0, 0, 0), (0, 400), (600, 400), 5)
 
-    draw_marker()
-
+    draw_markers()
 
     # Checking for events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        
-        if event.type == pygame.MOUSEBUTTONDOWN and clicked == False:
-            clicked = True
-        
-        if event.type == pygame.MOUSEBUTTONUP and clicked:
-            clicked = False
-            pos = pygame.mouse.get_pos()
-            cell_x = pos[0]
-            cell_y = pos[1]
-            if board[cell_x // 200][cell_y//200] == 0:
-                board[cell_x // 200][cell_y//200] = player
-                player *= -1
-                check_winner()
-            
-            print(pos)
 
+        if game_over == 0:
+            
+            if event.type == pygame.MOUSEBUTTONDOWN and clicked == False:
+                clicked = True
+
+            if event.type == pygame.MOUSEBUTTONUP and clicked == True:
+                clicked = False
+                pos = pygame.mouse.get_pos()
+                print(pos)
+                
+                x = pos[0]
+                y = pos[1]
+
+                x_pos = x // 200
+                y_pos = y // 200
+
+                if board[x_pos][y_pos] == 0:
+                    board[x_pos][y_pos] = player
+                    player *= -1
+                    check_winner()
+    
+    if game_over == True:
+        draw_winning_text(winner)
     
     pygame.display.update()
 
