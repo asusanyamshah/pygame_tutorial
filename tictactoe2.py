@@ -25,6 +25,8 @@ green = (50, 255, 50)
 
 player = 1
 
+draw = False
+
 winner = 0
 game_over = False
 
@@ -35,6 +37,26 @@ board = [
     [0, 0, 0],
     [0, 0, 0]
 ]
+
+
+def check_draw():
+
+    global draw
+    global game_over
+
+    if not game_over:
+
+        if 0 not in board[0] and 0 not in board[1] and 0 not in board[2]:
+            if winner == 0:
+                draw = True
+                game_over = True
+
+
+def display_draw_text():
+    draw_text = "Its a Draw!"
+    draw_img = font.render(draw_text, True, (0, 0, 255))
+    screen.blit(draw_img, (140, 270))
+
 
 def draw_winning_text(winner):
 
@@ -137,9 +159,13 @@ while run:
                     board[x_pos][y_pos] = player
                     player *= -1
                     check_winner()
+                    check_draw()
     
     if game_over == True:
-        draw_winning_text(winner)
+        if draw == True:
+            display_draw_text()
+        else:
+            draw_winning_text(winner)
     
     pygame.display.update()
 
